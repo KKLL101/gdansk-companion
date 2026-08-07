@@ -161,16 +161,15 @@ export default function App() {
   return (
     <main>
       <header className="hero">
-        <p>Personlig web-app til iPhone</p>
+        <p>Gdańsk · Old Town</p>
         <h1>Gdańsk Companion</h1>
-        <p className="hero-text">Gratis rejseapp til dig og din hustru. Åbn linket i Safari, og føj den til hjemmeskærmen.</p>
+        <p className="hero-text">Jess Krolewski Gdansk Old Town</p>
         <div className="status">{location ? 'GPS aktiv' : 'GPS klar'} · {favorites.length} favoritter · {expenses.length} udgifter</div>
       </header>
 
       <nav>
         {[
-          ['nearby', '📍', 'Nær mig'],
-          ['now', '🤔', 'Nu'],
+          ['nearby', '📍', 'Forside'],
           ['food', '🍽️', 'Mad'],
           ['plan', '📅', 'Plan'],
           ['budget', '💰', 'Budget'],
@@ -189,6 +188,13 @@ export default function App() {
           </div>
           <button className="primary" onClick={useCurrentLocation}>Brug min position</button>
         </div>
+
+        <div className="card">
+          <h2>🌦️ Vejr i Gdańsk</h2>
+          <p>Åbn vejrudsigten, så I hurtigt kan vælge mellem byvandring, museum eller restaurant.</p>
+          <div className="buttons"><a href={weatherUrl} target="_blank" rel="noreferrer">Åbn vejrudsigt</a></div>
+        </div>
+
         <div className="card">
           <h2>🏨 Tilbage til hotellet</h2>
           <p>{HOTEL.name}</p>
@@ -197,26 +203,15 @@ export default function App() {
             <a href={hotelGoogleMaps} target="_blank" rel="noreferrer" className="dark">Åbn i Google Maps</a>
           </div>
         </div>
-        <div className="grid">{sortedPlaces.map((place) => <Card key={place.id} place={place} />)}</div>
-      </section>}
 
-      {tab === 'now' && <section>
         <div className="card">
           <h2>🤔 Hvad skal vi lave nu?</h2>
           <p className="meta">{nowSuggestion.title}</p>
           <p>{nowSuggestion.text}</p>
           {nowSuggestion.items.map((item) => <p className="todo" key={item}>{item}</p>)}
         </div>
-        <div className="card">
-          <h2>🌦️ Vejr i Gdańsk</h2>
-          <p>Åbn vejrudsigten, så I hurtigt kan vælge mellem byvandring, museum eller restaurant.</p>
-          <div className="buttons"><a href={weatherUrl} target="_blank" rel="noreferrer">Åbn vejrudsigt</a></div>
-        </div>
-        <div className="card">
-          <h2>🏨 Hurtigt hjem</h2>
-          <p>Hvis I bare vil tilbage til hotellet:</p>
-          <div className="buttons"><a href={hotelAppleMaps} target="_blank" rel="noreferrer">Tag mig til hotellet</a></div>
-        </div>
+
+        <div className="grid">{sortedPlaces.map((place) => <Card key={place.id} place={place} />)}</div>
       </section>}
 
       {tab === 'food' && <section>
@@ -236,7 +231,7 @@ export default function App() {
 
       {tab === 'info' && <section className="two-col">
         <article className="card"><h2>✈️ Rejseinfo</h2>{[['hotel','Hotel'],['flight','Fly'],['booking','Bookingnumre'],['notes','Noter']].map(([field, label]) => <label key={field}>{label}<textarea value={tripInfo[field] || ''} onChange={(e) => setTripInfo({ ...tripInfo, [field]: e.target.value })} placeholder="Skriv her..." /></label>)}</article>
-        <article className="card"><h2>📱 Del med din hustru</h2><ol><li>Send hende linket til appen.</li><li>Hun åbner linket i Safari.</li><li>Hun trykker Del.</li><li>Hun vælger Føj til hjemmeskærm.</li></ol><p className="note">Favoritter, budget og noter gemmes lokalt på hver telefon. I deler selve appen og indholdet, men ikke private noter automatisk.</p></article>
+        <article className="card"><h2>📱 Del appen</h2><ol><li>Send linket til appen.</li><li>Åbn linket i Safari.</li><li>Tryk Del.</li><li>Vælg Føj til hjemmeskærm.</li></ol><p className="note">Favoritter, budget og noter gemmes lokalt på hver telefon.</p></article>
       </section>}
     </main>
   );
