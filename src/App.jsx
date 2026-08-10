@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
 const STORAGE = {
-  favorites: 'gdansk_family_favorites',
-  expenses: 'gdansk_family_expenses',
-  tripInfo: 'gdansk_family_trip_info'
+  favorites: 'gdansk_family_favorites_v2',
+  expenses: 'gdansk_family_expenses_v2',
+  tripInfo: 'gdansk_family_trip_info_v2'
 };
 
 const HOTEL = {
@@ -28,58 +28,60 @@ function writeStorage(key, value) {
   }
 }
 
-const PLACES = [
-  // Seværdigheder, museer og unikke oplevelser
-  { id: 'royal-way', name: 'Royal Way, Długa og Długi Targ', type: 'Seværdighed', category: 'Byvandring', lat: 54.3488, lng: 18.6532, rating: 'Klassiker', price: 'Gratis', notes: 'Den oplagte første gåtur gennem hovedbyen med Długa, Długi Targ, rådhuset og Neptunfontænen.', mapQuery: 'Royal Way Gdansk Dluga Długi Targ' },
-  { id: 'st-marys', name: 'Mariakirken', type: 'Seværdighed', category: 'Historie', lat: 54.3499, lng: 18.6533, rating: 'Must see', price: 'Lav', notes: 'Stor gotisk murstenskirke tæt på Mariacka Street. God som ankerpunkt for en tur i centrum.', mapQuery: 'St Mary Church Gdansk' },
-  { id: 'mariacka', name: 'Mariacka Street', type: 'Seværdighed', category: 'Rav og stemning', lat: 54.3495, lng: 18.6562, rating: 'Fotostop', price: 'Gratis', notes: 'Charmerende brostensgade med ravbutikker, fine facader og god stemning.', mapQuery: 'Mariacka Street Gdansk' },
-  { id: 'motlawa', name: 'Motława Waterfront og Granary Island', type: 'Seværdighed', category: 'Aftenstemning', lat: 54.3507, lng: 18.6586, rating: 'Nem favorit', price: 'Gratis', notes: 'Perfekt til aftengåtur, kaffe, udsigt og middag i området.', mapQuery: 'Motlawa Waterfront Granary Island Gdansk' },
-  { id: 'neptune', name: 'Neptunfontænen', type: 'Seværdighed', category: 'Bymidte', lat: 54.3486, lng: 18.6530, rating: 'Klassiker', price: 'Gratis', notes: 'Et hurtigt og klassisk stop midt på Długi Targ. Godt mødested i centrum.', mapQuery: 'Neptune Fountain Gdansk' },
+const SIGHTS = [
+  { id: 'royal-way', name: 'Royal Way, Długa og Długi Targ', type: 'Seværdighed', category: 'Old Town', lat: 54.3488, lng: 18.6532, rating: 'Klassiker', price: 'Gratis', notes: 'Den oplagte første gåtur gennem hovedbyen med Długa, Długi Targ, rådhuset og Neptunfontænen.', mapQuery: 'Royal Way Gdansk Dluga Długi Targ' },
+  { id: 'st-marys', name: 'Mariakirken', type: 'Seværdighed', category: 'Old Town', lat: 54.3499, lng: 18.6533, rating: 'Must see', price: 'Lav', notes: 'Stor gotisk murstenskirke tæt på Mariacka Street. God som ankerpunkt for en tur i centrum.', mapQuery: 'St Mary Church Gdansk' },
+  { id: 'mariacka', name: 'Mariacka Street', type: 'Seværdighed', category: 'Old Town', lat: 54.3495, lng: 18.6562, rating: 'Fotostop', price: 'Gratis', notes: 'Charmerende brostensgade med ravbutikker, fine facader og god stemning.', mapQuery: 'Mariacka Street Gdansk' },
+  { id: 'motlawa', name: 'Motława Waterfront', type: 'Seværdighed', category: 'Havnefront', lat: 54.3507, lng: 18.6586, rating: 'Nem favorit', price: 'Gratis', notes: 'Perfekt til aftengåtur, kaffe, udsigt og middag i området.', mapQuery: 'Motlawa Waterfront Gdansk' },
+  { id: 'granary-island', name: 'Granary Island', type: 'Seværdighed', category: 'Havnefront', lat: 54.3486, lng: 18.6587, rating: 'Aftenstemning', price: 'Gratis', notes: 'Moderne havneområde med restauranter, broer og udsigt.', mapQuery: 'Granary Island Gdansk' },
+  { id: 'neptune', name: 'Neptunfontænen', type: 'Seværdighed', category: 'Old Town', lat: 54.3486, lng: 18.6530, rating: 'Klassiker', price: 'Gratis', notes: 'Hurtigt og klassisk stop midt på Długi Targ.', mapQuery: 'Neptune Fountain Gdansk' },
   { id: 'crane', name: 'Den gamle kran Żuraw', type: 'Seværdighed', category: 'Havnefront', lat: 54.3507, lng: 18.6576, rating: 'Klassiker', price: 'Gratis/lav', notes: 'Et af Gdańsks mest kendte vartegn ved Motława-floden.', mapQuery: 'The Crane Zuraw Gdansk' },
-  { id: 'golden-gate', name: 'Golden Gate', type: 'Seværdighed', category: 'Byvandring', lat: 54.3490, lng: 18.6486, rating: 'Hurtigt stop', price: 'Gratis', notes: 'Fin start eller afslutning på Royal Way.', mapQuery: 'Golden Gate Gdansk' },
-  { id: 'green-gate', name: 'Green Gate', type: 'Seværdighed', category: 'Byvandring', lat: 54.3483, lng: 18.6554, rating: 'Hurtigt stop', price: 'Gratis', notes: 'Flot port ved overgangen mellem Long Market og havnefronten.', mapQuery: 'Green Gate Gdansk' },
-  { id: 'amber-museum', name: 'Amber Museum', type: 'Museum', category: 'Rav', lat: 54.3524, lng: 18.6510, rating: 'God backup', price: 'Medium', notes: 'Oplagt hvis I vil forstå ravets betydning for Gdańsk.', mapQuery: 'Amber Museum Gdansk' },
-  { id: 'solidarity', name: 'European Solidarity Centre', type: 'Museum', category: 'Historie', lat: 54.3611, lng: 18.6492, rating: 'Stærk oplevelse', price: 'Medium', notes: 'Museum om Solidaritet, skibsværftet og nyere europæisk historie.', mapQuery: 'European Solidarity Centre Gdansk' },
-  { id: 'ww2', name: 'Museum of the Second World War', type: 'Museum', category: 'Historie', lat: 54.3564, lng: 18.6600, rating: 'Must see', price: 'Medium', notes: 'Et større museum, der er bedst når I har god tid eller hvis vejret ikke er til lange gåture.', mapQuery: 'Museum of the Second World War Gdansk' },
-  { id: 'upghagen', name: 'Uphagen House', type: 'Museum', category: 'Historisk hus', lat: 54.3491, lng: 18.6499, rating: 'Kort museum', price: 'Medium', notes: 'Et mindre museum i centrum, som passer godt ind i en gåtur på Długa.', mapQuery: 'Uphagen House Gdansk' },
-  { id: 'great-mill', name: 'Great Mill', type: 'Seværdighed', category: 'Historisk bygning', lat: 54.3535, lng: 18.6495, rating: 'Kort stop', price: 'Gratis', notes: 'Fin afstikker nær den ældre del af byen.', mapQuery: 'Great Mill Gdansk' },
-  { id: 'olivia', name: 'Oliwa Park og Katedral', type: 'Udflugt', category: 'Grønt område', lat: 54.4103, lng: 18.5609, rating: 'Rolig pause', price: 'Gratis/lav', notes: 'Roligere udflugt nord for centrum. Kan kombineres med kaffe eller en tur mod Sopot.', mapQuery: 'Oliwa Park Cathedral Gdansk' },
-  { id: 'westerplatte', name: 'Westerplatte', type: 'Udflugt', category: 'Historie', lat: 54.4067, lng: 18.6728, rating: 'Historisk', price: 'Gratis/lav', notes: 'Historisk område uden for centrum. Bedst hvis I vil lidt længere væk fra Old Town.', mapQuery: 'Westerplatte Gdansk' },
-  { id: 'sopot-pier', name: 'Sopot Pier', type: 'Udflugt', category: 'Kysttur', lat: 54.4479, lng: 18.5686, rating: 'Populær udflugt', price: 'Lav/medium', notes: 'Klassisk udflugt fra Gdańsk med strand, mole og ferieby-stemning.', mapQuery: 'Sopot Pier' },
+  { id: 'golden-gate', name: 'Golden Gate', type: 'Seværdighed', category: 'Old Town', lat: 54.3490, lng: 18.6486, rating: 'Hurtigt stop', price: 'Gratis', notes: 'Fin start eller afslutning på Royal Way.', mapQuery: 'Golden Gate Gdansk' },
+  { id: 'green-gate', name: 'Green Gate', type: 'Seværdighed', category: 'Old Town', lat: 54.3483, lng: 18.6554, rating: 'Hurtigt stop', price: 'Gratis', notes: 'Flot port ved overgangen mellem Long Market og havnefronten.', mapQuery: 'Green Gate Gdansk' },
+  { id: 'amber-museum', name: 'Amber Museum', type: 'Museum', category: 'Museer', lat: 54.3524, lng: 18.6510, rating: 'God backup', price: 'Medium', notes: 'Oplagt hvis I vil forstå ravets betydning for Gdańsk.', mapQuery: 'Amber Museum Gdansk' },
+  { id: 'solidarity', name: 'European Solidarity Centre', type: 'Museum', category: 'Museer', lat: 54.3611, lng: 18.6492, rating: 'Stærk oplevelse', price: 'Medium', notes: 'Museum om Solidaritet, skibsværftet og nyere europæisk historie.', mapQuery: 'European Solidarity Centre Gdansk' },
+  { id: 'ww2', name: 'Museum of the Second World War', type: 'Museum', category: 'Museer', lat: 54.3564, lng: 18.6600, rating: 'Must see', price: 'Medium', notes: 'Et større museum, der er bedst når I har god tid eller hvis vejret ikke er til lange gåture.', mapQuery: 'Museum of the Second World War Gdansk' },
+  { id: 'upghagen', name: 'Uphagen House', type: 'Museum', category: 'Museer', lat: 54.3491, lng: 18.6499, rating: 'Kort museum', price: 'Medium', notes: 'Mindre museum i centrum, som passer godt ind i en gåtur på Długa.', mapQuery: 'Uphagen House Gdansk' },
+  { id: 'great-mill', name: 'Great Mill', type: 'Seværdighed', category: 'Lokalt', lat: 54.3535, lng: 18.6495, rating: 'Kort stop', price: 'Gratis', notes: 'Fin afstikker nær den ældre del af byen.', mapQuery: 'Great Mill Gdansk' },
+  { id: 'market-hall', name: 'Hala Targowa', type: 'Oplevelse', category: 'Lokalt', lat: 54.3530, lng: 18.6506, rating: 'Lokalt stop', price: 'Gratis', notes: 'Markedshal tæt på centrum. God til et kort lokalt stop.', mapQuery: 'Hala Targowa Gdansk' },
+  { id: '100cznia', name: '100cznia', type: 'Oplevelse', category: 'Unikt', lat: 54.3636, lng: 18.6468, rating: 'Unikt sted', price: 'Mellem', notes: 'Råt og kreativt område ved skibsværftet med mad, drikke og byliv.', mapQuery: '100cznia Gdansk' },
+  { id: 'elektrykow', name: 'Ulica Elektryków', type: 'Oplevelse', category: 'Unikt', lat: 54.3631, lng: 18.6475, rating: 'Unikt sted', price: 'Mellem', notes: 'Skibsværftsstemning, uformelt natteliv og et anderledes Gdańsk end Old Town.', mapQuery: 'Ulica Elektrykow Gdansk' },
+  { id: 'shipyard', name: 'Gdańsk Shipyard-området', type: 'Oplevelse', category: 'Unikt', lat: 54.3640, lng: 18.6490, rating: 'Unikt område', price: 'Gratis', notes: 'Godt at kombinere med European Solidarity Centre og 100cznia.', mapQuery: 'Gdansk Shipyard' },
+  { id: 'oliva', name: 'Oliwa Park og Katedral', type: 'Udflugt', category: 'Udflugter', lat: 54.4103, lng: 18.5609, rating: 'Rolig pause', price: 'Gratis/lav', notes: 'Roligere udflugt nord for centrum. Kan kombineres med kaffe eller en tur mod Sopot.', mapQuery: 'Oliwa Park Cathedral Gdansk' },
+  { id: 'westerplatte', name: 'Westerplatte', type: 'Udflugt', category: 'Udflugter', lat: 54.4067, lng: 18.6728, rating: 'Historisk', price: 'Gratis/lav', notes: 'Historisk område uden for centrum. Bedst hvis I vil lidt længere væk fra Old Town.', mapQuery: 'Westerplatte Gdansk' },
+  { id: 'sopot-pier', name: 'Sopot Pier', type: 'Udflugt', category: 'Udflugter', lat: 54.4479, lng: 18.5686, rating: 'Populær udflugt', price: 'Lav/medium', notes: 'Klassisk udflugt fra Gdańsk med strand, mole og ferieby-stemning.', mapQuery: 'Sopot Pier' },
   { id: 'sopot-beach', name: 'Sopot Beach', type: 'Udflugt', category: 'Strand', lat: 54.4445, lng: 18.5700, rating: 'Sommerstemning', price: 'Gratis', notes: 'God hvis vejret er fint, og I vil have luft og strand.', mapQuery: 'Sopot Beach' },
   { id: 'brzezno', name: 'Brzeźno Strand', type: 'Udflugt', category: 'Strand', lat: 54.4137, lng: 18.6274, rating: 'Lokal strand', price: 'Gratis', notes: 'Et mere afslappet strandvalg tættere på Gdańsk end Sopot.', mapQuery: 'Brzezno Beach Gdansk' },
-  { id: '100cznia', name: '100cznia', type: 'Oplevelse', category: 'Food hall / kreativt område', lat: 54.3636, lng: 18.6468, rating: 'Unikt sted', price: 'Mellem', notes: 'Et mere råt og kreativt område ved skibsværftet med mad, drikke og byliv.', mapQuery: '100cznia Gdansk' },
-  { id: 'elektrykow', name: 'Ulica Elektryków', type: 'Oplevelse', category: 'Kultur / aften', lat: 54.3631, lng: 18.6475, rating: 'Unikt sted', price: 'Mellem', notes: 'Skibsværftsstemning, uformelt natteliv og et anderledes Gdańsk end Old Town.', mapQuery: 'Ulica Elektrykow Gdansk' },
-  { id: 'shipyard', name: 'Gdańsk Shipyard-området', type: 'Oplevelse', category: 'Industrihistorie', lat: 54.3640, lng: 18.6490, rating: 'Unikt område', price: 'Gratis', notes: 'Godt at kombinere med European Solidarity Centre og 100cznia.', mapQuery: 'Gdansk Shipyard' },
-  { id: 'market-hall', name: 'Hala Targowa', type: 'Oplevelse', category: 'Marked', lat: 54.3530, lng: 18.6506, rating: 'Lokalt stop', price: 'Gratis', notes: 'Markedshal tæt på centrum. God til et kort lokalt stop.', mapQuery: 'Hala Targowa Gdansk' },
+  { id: 'ergo', name: 'Ergo Arena-området', type: 'Udflugt', category: 'Udflugter', lat: 54.4266, lng: 18.5804, rating: 'Kort stop', price: 'Gratis', notes: 'Ikke et must, men relevant hvis I alligevel er mellem Gdańsk og Sopot.', mapQuery: 'Ergo Arena Gdansk Sopot' },
+  { id: 'hevelianum', name: 'Hevelianum', type: 'Oplevelse', category: 'Udsigt', lat: 54.3565, lng: 18.6426, rating: 'Udsigt', price: 'Lav/medium', notes: 'God udsigt over byen og lidt anderledes end de klassiske Old Town-stop.', mapQuery: 'Hevelianum Gdansk' }
+];
 
-  // Restauranter, caféer, barer og madoplevelser
-  { id: 'pierogarnia', name: 'Pierogarnia Stary Młyn', type: 'Restaurant', category: 'Polsk / pierogi', lat: 54.3515, lng: 18.6483, rating: '4.7', price: 'Mellem', notes: 'Godt sted til pierogi og en uformel middag. Kig efter kø og book hvis muligt.', mapQuery: 'Pierogarnia Stary Mlyn Gdansk' },
-  { id: 'mandu', name: 'Pierogarnia Mandu', type: 'Restaurant', category: 'Polsk / pierogi', lat: 54.3537, lng: 18.6467, rating: 'Populær', price: 'Mellem', notes: 'Meget populært pierogi-sted. Godt valg hvis I vil prøve polsk comfort food.', mapQuery: 'Pierogarnia Mandu Gdansk Elzbietanska' },
-  { id: 'pomelo', name: 'Pomelo Gdańsk', type: 'Restaurant', category: 'Polsk / moderne', lat: 54.3520, lng: 18.6508, rating: '4.8', price: 'Mellem', notes: 'Fleksibelt valg til brunch, frokost eller casual dinner i centrum.', mapQuery: 'Pomelo Gdansk restaurant' },
-  { id: 'manna', name: 'Manna 68', type: 'Restaurant', category: 'Vegetar / international', lat: 54.3482, lng: 18.6561, rating: '4.9', price: 'Mellem', notes: 'Godt valg hvis I vil have noget lettere, grønnere og mindre traditionelt.', mapQuery: 'Manna 68 Gdansk' },
-  { id: 'tygle', name: 'TYGLE Gdańskie', type: 'Restaurant', category: 'Polsk / europæisk', lat: 54.3491, lng: 18.6577, rating: '4.8', price: 'Høj', notes: 'Mere upscale valg til en aften, hvor middagen gerne må være en større oplevelse.', mapQuery: 'TYGLE Gdanskie restaurant' },
-  { id: 'literacka', name: 'Literacka Restaurant & Wine Bar', type: 'Restaurant', category: 'Polsk / europæisk', lat: 54.3497, lng: 18.6536, rating: '4.7', price: 'Mellem', notes: 'God kandidat til en rolig middag med vin tæt på Mariakirken og Mariacka Street.', mapQuery: 'Literacka Restaurant Wine Bar Gdansk' },
+const FOOD = [
+  { id: 'pierogarnia', name: 'Pierogarnia Stary Młyn', type: 'Restaurant', category: 'Polsk', lat: 54.3515, lng: 18.6483, rating: '4.7', price: 'Mellem', notes: 'Godt sted til pierogi og en uformel middag. Kig efter kø og book hvis muligt.', mapQuery: 'Pierogarnia Stary Mlyn Gdansk' },
+  { id: 'mandu', name: 'Pierogarnia Mandu', type: 'Restaurant', category: 'Polsk', lat: 54.3537, lng: 18.6467, rating: 'Populær', price: 'Mellem', notes: 'Meget populært pierogi-sted. Godt valg til polsk comfort food.', mapQuery: 'Pierogarnia Mandu Gdansk Elzbietanska' },
+  { id: 'pomelo', name: 'Pomelo Gdańsk', type: 'Restaurant', category: 'Polsk', lat: 54.3520, lng: 18.6508, rating: '4.8', price: 'Mellem', notes: 'Fleksibelt valg til brunch, frokost eller casual dinner i centrum.', mapQuery: 'Pomelo Gdansk restaurant' },
+  { id: 'manna', name: 'Manna 68', type: 'Restaurant', category: 'Vegetar', lat: 54.3482, lng: 18.6561, rating: '4.9', price: 'Mellem', notes: 'Godt valg hvis I vil have noget lettere, grønnere og mindre traditionelt.', mapQuery: 'Manna 68 Gdansk' },
+  { id: 'tygle', name: 'TYGLE Gdańskie', type: 'Restaurant', category: 'Fine dining', lat: 54.3491, lng: 18.6577, rating: '4.8', price: 'Høj', notes: 'Mere upscale valg til en aften, hvor middagen gerne må være en større oplevelse.', mapQuery: 'TYGLE Gdanskie restaurant' },
+  { id: 'literacka', name: 'Literacka Restaurant & Wine Bar', type: 'Restaurant', category: 'Fine dining', lat: 54.3497, lng: 18.6536, rating: '4.7', price: 'Mellem', notes: 'God kandidat til en rolig middag med vin tæt på Mariakirken og Mariacka Street.', mapQuery: 'Literacka Restaurant Wine Bar Gdansk' },
   { id: 'fino', name: 'Fino', type: 'Restaurant', category: 'Fine dining', lat: 54.3516, lng: 18.6570, rating: 'Populær', price: 'Høj', notes: 'Et mere ambitiøst restaurantvalg til en særlig aften.', mapQuery: 'Fino Gdansk restaurant' },
-  { id: 'eliksir', name: 'Eliksir', type: 'Restaurant', category: 'Polsk / cocktails', lat: 54.3828, lng: 18.5992, rating: 'Populær', price: 'Høj', notes: 'Godt valg hvis I vil kombinere mad og cocktails uden for det mest turistede centrum.', mapQuery: 'Eliksir Gdansk restaurant' },
-  { id: 'ritz', name: 'Ritz Restaurant', type: 'Restaurant', category: 'Polsk / fine dining', lat: 54.3503, lng: 18.6593, rating: 'Populær', price: 'Høj', notes: 'Klassisk upscale restaurantvalg nær vandet.', mapQuery: 'Ritz Restaurant Gdansk' },
-  { id: 'kubicki', name: 'Restauracja Kubicki', type: 'Restaurant', category: 'Polsk / klassisk', lat: 54.3525, lng: 18.6602, rating: 'Klassisk', price: 'Mellem/høj', notes: 'Klassisk polsk restaurant ved havnefronten.', mapQuery: 'Restauracja Kubicki Gdansk' },
-  { id: 'gdanski-bowke', name: 'Gdański Bowke', type: 'Restaurant', category: 'Polsk / havnefront', lat: 54.3498, lng: 18.6576, rating: 'Klassisk', price: 'Mellem', notes: 'Centralt valg med lokal og maritim stemning.', mapQuery: 'Gdanski Bowke Gdansk' },
-  { id: 'goldwasser', name: 'Goldwasser Restaurant', type: 'Restaurant', category: 'Polsk / historisk', lat: 54.3505, lng: 18.6593, rating: 'Klassisk', price: 'Mellem/høj', notes: 'Historisk navn og central placering ved vandet.', mapQuery: 'Goldwasser Restaurant Gdansk' },
+  { id: 'eliksir', name: 'Eliksir', type: 'Restaurant', category: 'Fine dining', lat: 54.3828, lng: 18.5992, rating: 'Populær', price: 'Høj', notes: 'Godt valg hvis I vil kombinere mad og cocktails uden for det mest turistede centrum.', mapQuery: 'Eliksir Gdansk restaurant' },
+  { id: 'ritz', name: 'Ritz Restaurant', type: 'Restaurant', category: 'Fine dining', lat: 54.3503, lng: 18.6593, rating: 'Populær', price: 'Høj', notes: 'Klassisk upscale restaurantvalg nær vandet.', mapQuery: 'Ritz Restaurant Gdansk' },
+  { id: 'kubicki', name: 'Restauracja Kubicki', type: 'Restaurant', category: 'Polsk', lat: 54.3525, lng: 18.6602, rating: 'Klassisk', price: 'Mellem/høj', notes: 'Klassisk polsk restaurant ved havnefronten.', mapQuery: 'Restauracja Kubicki Gdansk' },
+  { id: 'bowke', name: 'Gdański Bowke', type: 'Restaurant', category: 'Polsk', lat: 54.3498, lng: 18.6576, rating: 'Klassisk', price: 'Mellem', notes: 'Centralt valg med lokal og maritim stemning.', mapQuery: 'Gdanski Bowke Gdansk' },
+  { id: 'goldwasser', name: 'Goldwasser Restaurant', type: 'Restaurant', category: 'Polsk', lat: 54.3505, lng: 18.6593, rating: 'Klassisk', price: 'Mellem/høj', notes: 'Historisk navn og central placering ved vandet.', mapQuery: 'Goldwasser Restaurant Gdansk' },
   { id: 'mercato', name: 'Mercato', type: 'Restaurant', category: 'Fine dining', lat: 54.3505, lng: 18.6533, rating: 'Eksklusiv', price: 'Høj', notes: 'Mere elegant restaurantvalg til en rolig middag.', mapQuery: 'Mercato Gdansk restaurant' },
-  { id: 'whiskey', name: 'Whiskey in the Jar', type: 'Restaurant', category: 'Steak / burger', lat: 54.3488, lng: 18.6556, rating: 'Populær', price: 'Mellem', notes: 'Hvis I får lyst til noget andet end polsk mad.', mapQuery: 'Whiskey in the Jar Gdansk' },
-  { id: 'billys', name: "Billy's American Restaurant", type: 'Restaurant', category: 'American', lat: 54.3492, lng: 18.6584, rating: 'Populær', price: 'Mellem', notes: 'Uformelt valg med amerikansk mad på Granary Island.', mapQuery: "Billy's American Restaurant Gdansk Wyspa Spichrzow" },
-  { id: 'smaki-indii', name: 'Smaki Indii', type: 'Restaurant', category: 'Indisk', lat: 54.3515, lng: 18.6501, rating: 'Populær', price: 'Mellem', notes: 'Godt alternativ til polsk mad, hvis I vil have indisk.', mapQuery: 'Smaki Indii Restaurant Gdansk' },
-  { id: 'durga', name: 'Durga', type: 'Restaurant', category: 'Indisk', lat: 54.3535, lng: 18.6465, rating: 'Populær', price: 'Mellem', notes: 'Endnu et stærkt bud på indisk mad i Gdańsk.', mapQuery: 'Durga Gdansk restaurant' },
-  { id: 'drukarnia', name: 'Drukarnia Cafe', type: 'Restaurant', category: 'Café / kaffe', lat: 54.3496, lng: 18.6556, rating: 'Café', price: 'Lav/mellem', notes: 'God kaffepause tæt på Mariacka Street.', mapQuery: 'Drukarnia Cafe Gdansk' },
-  { id: 'retro-cafe', name: 'Retro Cafe', type: 'Restaurant', category: 'Café / kage', lat: 54.3508, lng: 18.6519, rating: 'Café', price: 'Lav/mellem', notes: 'Hyggeligt stop til kaffe og kage i centrum.', mapQuery: 'Retro Cafe Gdansk' },
-  { id: 'jozef-k', name: 'Józef K', type: 'Restaurant', category: 'Café / bar', lat: 54.3520, lng: 18.6500, rating: 'Unik stemning', price: 'Mellem', notes: 'Skævt og stemningsfuldt sted til kaffe eller en drink.', mapQuery: 'Jozef K Gdansk' },
-  { id: 'eklerownia', name: 'Eklerownia', type: 'Restaurant', category: 'Dessert / kage', lat: 54.3529, lng: 18.6467, rating: 'Sødt stop', price: 'Lav/mellem', notes: 'Godt stop hvis I vil have noget sødt.', mapQuery: 'Eklerownia Gdansk' },
-  { id: 'pg4', name: 'PG4', type: 'Restaurant', category: 'Bryggeri / mad', lat: 54.3557, lng: 18.6448, rating: 'Lokal øl', price: 'Mellem', notes: 'Mikrobryggeri tæt på togstationen med mad og øl.', mapQuery: 'PG4 Gdansk' },
-  { id: 'brovarnia', name: 'Brovarnia Gdańsk', type: 'Restaurant', category: 'Bryggeri / mad', lat: 54.3496, lng: 18.6602, rating: 'Bryggeri', price: 'Mellem', notes: 'Bryggeri og restaurant ved Old Town.', mapQuery: 'Brovarnia Gdansk' },
-  { id: 'pulapka', name: 'Pułapka', type: 'Restaurant', category: 'Craft beer / bar', lat: 54.3510, lng: 18.6560, rating: 'Bar', price: 'Mellem', notes: 'Hvis I vil prøve et mere specialiseret ølsted.', mapQuery: 'Pulapka Gdansk' },
-  { id: 'flisak76', name: "Flisak '76", type: 'Restaurant', category: 'Cocktailbar', lat: 54.3510, lng: 18.6530, rating: 'Cocktails', price: 'Mellem/høj', notes: 'Kendt cocktailbar og et godt aftenstop.', mapQuery: "Flisak '76 Gdansk" },
-  { id: 'cybermachina', name: 'Cybermachina', type: 'Restaurant', category: 'Bar / spil', lat: 54.3521, lng: 18.6507, rating: 'Sjov bar', price: 'Mellem', notes: 'Uformelt og anderledes barvalg med spiltema.', mapQuery: 'Cybermachina Gdansk' }
+  { id: 'whiskey', name: 'Whiskey in the Jar', type: 'Restaurant', category: 'Casual', lat: 54.3488, lng: 18.6556, rating: 'Populær', price: 'Mellem', notes: 'Hvis I får lyst til steak, burger eller noget andet end polsk mad.', mapQuery: 'Whiskey in the Jar Gdansk' },
+  { id: 'billys', name: "Billy's American Restaurant", type: 'Restaurant', category: 'Casual', lat: 54.3492, lng: 18.6584, rating: 'Populær', price: 'Mellem', notes: 'Uformelt valg med amerikansk mad på Granary Island.', mapQuery: "Billy's American Restaurant Gdansk Wyspa Spichrzow" },
+  { id: 'smaki', name: 'Smaki Indii', type: 'Restaurant', category: 'Internationalt', lat: 54.3515, lng: 18.6501, rating: 'Populær', price: 'Mellem', notes: 'Godt alternativ til polsk mad, hvis I vil have indisk.', mapQuery: 'Smaki Indii Restaurant Gdansk' },
+  { id: 'durga', name: 'Durga', type: 'Restaurant', category: 'Internationalt', lat: 54.3535, lng: 18.6465, rating: 'Populær', price: 'Mellem', notes: 'Endnu et stærkt bud på indisk mad i Gdańsk.', mapQuery: 'Durga Gdansk restaurant' },
+  { id: 'drukarnia', name: 'Drukarnia Cafe', type: 'Restaurant', category: 'Café', lat: 54.3496, lng: 18.6556, rating: 'Café', price: 'Lav/mellem', notes: 'God kaffepause tæt på Mariacka Street.', mapQuery: 'Drukarnia Cafe Gdansk' },
+  { id: 'retro', name: 'Retro Cafe', type: 'Restaurant', category: 'Café', lat: 54.3508, lng: 18.6519, rating: 'Café', price: 'Lav/mellem', notes: 'Hyggeligt stop til kaffe og kage i centrum.', mapQuery: 'Retro Cafe Gdansk' },
+  { id: 'jozef', name: 'Józef K', type: 'Restaurant', category: 'Café', lat: 54.3520, lng: 18.6500, rating: 'Unik stemning', price: 'Mellem', notes: 'Skævt og stemningsfuldt sted til kaffe eller en drink.', mapQuery: 'Jozef K Gdansk' },
+  { id: 'eklerownia', name: 'Eklerownia', type: 'Restaurant', category: 'Café', lat: 54.3529, lng: 18.6467, rating: 'Sødt stop', price: 'Lav/mellem', notes: 'Godt stop hvis I vil have noget sødt.', mapQuery: 'Eklerownia Gdansk' },
+  { id: 'pg4', name: 'PG4', type: 'Restaurant', category: 'Bar', lat: 54.3557, lng: 18.6448, rating: 'Lokal øl', price: 'Mellem', notes: 'Mikrobryggeri tæt på togstationen med mad og øl.', mapQuery: 'PG4 Gdansk' },
+  { id: 'brovarnia', name: 'Brovarnia Gdańsk', type: 'Restaurant', category: 'Bar', lat: 54.3496, lng: 18.6602, rating: 'Bryggeri', price: 'Mellem', notes: 'Bryggeri og restaurant ved Old Town.', mapQuery: 'Brovarnia Gdansk' },
+  { id: 'pulapka', name: 'Pułapka', type: 'Restaurant', category: 'Bar', lat: 54.3510, lng: 18.6560, rating: 'Craft beer', price: 'Mellem', notes: 'Hvis I vil prøve et mere specialiseret ølsted.', mapQuery: 'Pulapka Gdansk' },
+  { id: 'flisak', name: "Flisak '76", type: 'Restaurant', category: 'Bar', lat: 54.3510, lng: 18.6530, rating: 'Cocktails', price: 'Mellem/høj', notes: 'Kendt cocktailbar og et godt aftenstop.', mapQuery: "Flisak '76 Gdansk" }
 ];
 
 const ITINERARY = [
@@ -109,7 +111,7 @@ function getNowSuggestions() {
 }
 
 export default function App() {
-  const [tab, setTab] = useState('nearby');
+  const [tab, setTab] = useState('home');
   const [location, setLocation] = useState(null);
   const [locationError, setLocationError] = useState('');
   const [favorites, setFavorites] = useState(() => readStorage(STORAGE.favorites, []));
@@ -118,6 +120,8 @@ export default function App() {
   const [pln, setPln] = useState('100');
   const [expenseName, setExpenseName] = useState('');
   const [expenseAmount, setExpenseAmount] = useState('');
+  const [foodCategory, setFoodCategory] = useState('Alle');
+  const [sightCategory, setSightCategory] = useState('Alle');
 
   const dkkRate = 1.75;
   const nowSuggestion = getNowSuggestions();
@@ -129,12 +133,18 @@ export default function App() {
   useEffect(() => writeStorage(STORAGE.expenses, expenses), [expenses]);
   useEffect(() => writeStorage(STORAGE.tripInfo, tripInfo), [tripInfo]);
 
-  const sortedPlaces = useMemo(() => {
-    return [...PLACES].sort((a, b) => {
-      if (!location) return a.name.localeCompare(b.name);
-      return distanceInKm(location, a) - distanceInKm(location, b);
-    });
-  }, [location]);
+  const allPlaces = [...SIGHTS, ...FOOD];
+  const foodCategories = ['Alle', ...Array.from(new Set(FOOD.map((x) => x.category)))];
+  const sightCategories = ['Alle', ...Array.from(new Set(SIGHTS.map((x) => x.category)))];
+
+  const sortByDistance = (items) => [...items].sort((a, b) => {
+    if (!location) return a.name.localeCompare(b.name);
+    return distanceInKm(location, a) - distanceInKm(location, b);
+  });
+
+  const nearbyPlaces = useMemo(() => sortByDistance(allPlaces), [location]);
+  const visibleFood = useMemo(() => sortByDistance(foodCategory === 'Alle' ? FOOD : FOOD.filter((x) => x.category === foodCategory)), [location, foodCategory]);
+  const visibleSights = useMemo(() => sortByDistance(sightCategory === 'Alle' ? SIGHTS : SIGHTS.filter((x) => x.category === sightCategory)), [location, sightCategory]);
 
   const useCurrentLocation = () => {
     setLocationError('');
@@ -169,6 +179,12 @@ export default function App() {
   };
 
   const total = expenses.reduce((sum, item) => sum + item.amount, 0);
+
+  const CategoryButtons = ({ categories, selected, onSelect }) => (
+    <div className="buttons category-buttons">
+      {categories.map((cat) => <button key={cat} className={selected === cat ? 'primary' : 'chip'} onClick={() => onSelect(cat)}>{cat}</button>)}
+    </div>
+  );
 
   const Card = ({ place }) => {
     const km = location ? distanceInKm(location, place) : null;
@@ -208,54 +224,35 @@ export default function App() {
 
       <nav>
         {[
-          ['nearby', '📍', 'Forside'],
+          ['home', '📍', 'Forside'],
+          ['sights', '🏛️', 'Se'],
           ['food', '🍽️', 'Mad'],
           ['plan', '📅', 'Plan'],
           ['budget', '💰', 'Budget'],
           ['info', '✈️', 'Info']
-        ].map(([id, icon, label]) => (
-          <button key={id} className={tab === id ? 'selected' : ''} onClick={() => setTab(id)}><span>{icon}</span>{label}</button>
-        ))}
+        ].map(([id, icon, label]) => <button key={id} className={tab === id ? 'selected' : ''} onClick={() => setTab(id)}><span>{icon}</span>{label}</button>)}
       </nav>
 
-      {tab === 'nearby' && <section>
+      {tab === 'home' && <section>
         <div className="card intro">
-          <div>
-            <h2>📍 Hvad er tæt på?</h2>
-            <p>Tryk på GPS, så sorterer appen steder efter din position.</p>
-            {locationError && <p className="error">{locationError}</p>}
-          </div>
+          <div><h2>📍 Hvad er tæt på?</h2><p>Tryk på GPS, så sorterer appen steder efter din position.</p>{locationError && <p className="error">{locationError}</p>}</div>
           <button className="primary" onClick={useCurrentLocation}>Brug min position</button>
         </div>
+        <div className="card"><h2>🌦️ Vejr i Gdańsk</h2><p>Åbn vejrudsigten, så I hurtigt kan vælge mellem byvandring, museum eller restaurant.</p><div className="buttons"><a href={weatherUrl} target="_blank" rel="noreferrer">Åbn vejrudsigt</a></div></div>
+        <div className="card"><h2>🏨 Tilbage til hotellet</h2><p>{HOTEL.name}</p><div className="buttons"><a href={hotelAppleMaps} target="_blank" rel="noreferrer">Apple Maps</a><a href={hotelGoogleMaps} target="_blank" rel="noreferrer" className="dark">Google Maps</a></div></div>
+        <div className="card"><h2>🤔 Hvad skal vi lave nu?</h2><p className="meta">{nowSuggestion.title}</p><p>{nowSuggestion.text}</p>{nowSuggestion.items.map((item) => <p className="todo" key={item}>{item}</p>)}</div>
+        <div className="card"><h2>⭐ Nærmeste forslag</h2><p>Her vises de første 12 steder. Brug fanerne Se og Mad for hele listen.</p></div>
+        <div className="grid">{nearbyPlaces.slice(0, 12).map((place) => <Card key={place.id} place={place} />)}</div>
+      </section>}
 
-        <div className="card">
-          <h2>🌦️ Vejr i Gdańsk</h2>
-          <p>Åbn vejrudsigten, så I hurtigt kan vælge mellem byvandring, museum eller restaurant.</p>
-          <div className="buttons"><a href={weatherUrl} target="_blank" rel="noreferrer">Åbn vejrudsigt</a></div>
-        </div>
-
-        <div className="card">
-          <h2>🏨 Tilbage til hotellet</h2>
-          <p>{HOTEL.name}</p>
-          <div className="buttons">
-            <a href={hotelAppleMaps} target="_blank" rel="noreferrer">Åbn i Apple Maps</a>
-            <a href={hotelGoogleMaps} target="_blank" rel="noreferrer" className="dark">Åbn i Google Maps</a>
-          </div>
-        </div>
-
-        <div className="card">
-          <h2>🤔 Hvad skal vi lave nu?</h2>
-          <p className="meta">{nowSuggestion.title}</p>
-          <p>{nowSuggestion.text}</p>
-          {nowSuggestion.items.map((item) => <p className="todo" key={item}>{item}</p>)}
-        </div>
-
-        <div className="grid">{sortedPlaces.map((place) => <Card key={place.id} place={place} />)}</div>
+      {tab === 'sights' && <section>
+        <div className="card"><h2>🏛️ Seværdigheder og oplevelser</h2><p>{SIGHTS.length} udvalgte steder, herunder klassikere, museer, strande, udflugter og mere lokale steder.</p><CategoryButtons categories={sightCategories} selected={sightCategory} onSelect={setSightCategory} /></div>
+        <div className="grid">{visibleSights.map((place) => <Card key={place.id} place={place} />)}</div>
       </section>}
 
       {tab === 'food' && <section>
-        <div className="card"><h2>🍽️ Restauranter, caféer og barer</h2><p>Udvalgte steder med kort og Tripadvisor-søgning.</p></div>
-        <div className="grid">{PLACES.filter((p) => p.type === 'Restaurant').map((place) => <Card key={place.id} place={place} />)}</div>
+        <div className="card"><h2>🍽️ Restauranter, caféer og barer</h2><p>{FOOD.length} udvalgte steder, opdelt i kategorier.</p><CategoryButtons categories={foodCategories} selected={foodCategory} onSelect={setFoodCategory} /></div>
+        <div className="grid">{visibleFood.map((place) => <Card key={place.id} place={place} />)}</div>
       </section>}
 
       {tab === 'plan' && <section>
